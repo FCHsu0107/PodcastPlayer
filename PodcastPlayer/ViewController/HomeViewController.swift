@@ -33,6 +33,7 @@ class HomeViewController: UIViewController {
 }
 
 extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return podcastList.count
     }
@@ -57,5 +58,10 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
         let imageView = UIImageView()
         imageView.backgroundColor = .green
         return imageView
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let episodePage = EpisodeViewController(podcastList[indexPath.row])
+        navigationController?.pushViewController(episodePage, animated: true)
     }
 }
