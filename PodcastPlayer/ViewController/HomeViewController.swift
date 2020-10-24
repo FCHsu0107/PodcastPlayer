@@ -37,6 +37,7 @@ class HomeViewController: UIViewController {
     }
     
     private func getRSSFeedInfo() {
+        // TODO: save url string in plist
         let rssFeedPath = "https://feeds.soundcloud.com/users/soundcloud:users:322164009/sounds.rss"
         let parser = RSSParser()
         parser.request(urlPath: rssFeedPath) { [weak self] result in
