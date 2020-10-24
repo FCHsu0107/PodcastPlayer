@@ -13,10 +13,19 @@ class HomeViewController: UIViewController {
     
     var tableView: UITableView!
     var podcastList: [String] = ["A", "B", "C", "D"]
+    var netWorkManager = NetworkManager()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpUI()
+        netWorkManager.request { (result) in
+            switch result {
+            case .failure(let error):
+                print("JQ error \(error)")
+            case .success(let data):
+                print("JQ get data!! \(data)")
+            }
+        }
     }
     
     private func setUpUI() {
