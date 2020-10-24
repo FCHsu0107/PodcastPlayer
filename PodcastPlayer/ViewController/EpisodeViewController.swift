@@ -11,10 +11,12 @@ import SnapKit
 
 class EpisodeViewController: UIViewController {
     
-    let item: EpisodeItem
+    private let item: EpisodeItem
+    private let channelName: String
     
-    init(_ item: EpisodeItem) {
+    init(_ item: EpisodeItem, channelName: String) {
         self.item = item
+        self.channelName = channelName
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -39,6 +41,29 @@ class EpisodeViewController: UIViewController {
             make.trailing.equalToSuperview().offset(-16)
             make.top.equalTo(self.view.safeArea.top).offset(8)
             make.height.equalTo(episodeImage.snp.width)
+        }
+        
+        let channelNameLabel = UILabel()
+        view.addSubview(channelNameLabel)
+        channelNameLabel.textColor = .black
+        channelNameLabel.font = UIFont.systemFont(ofSize: 22)
+        channelNameLabel.text = channelName
+        channelNameLabel.snp.makeConstraints { make in
+            make.leading.equalTo(episodeImage).offset(10)
+            make.trailing.equalTo(episodeImage).offset(-10)
+            make.top.equalTo(episodeImage)
+            make.height.equalTo(episodeImage.snp.height).multipliedBy(0.22)
+        }
+        
+        let titleLabel = UILabel()
+        view.addSubview(titleLabel)
+        titleLabel.font = UIFont.systemFont(ofSize: 16)
+        titleLabel.textColor = .darkGray
+        titleLabel.numberOfLines = 0
+        titleLabel.text = item.title
+        titleLabel.snp.makeConstraints { make in
+            make.trailing.leading.equalTo(channelNameLabel)
+            make.top.equalTo(channelNameLabel.snp.bottom)
         }
         
         let playButton = UIButton()

@@ -73,23 +73,23 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
     
     // Header
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        guard channelItem != nil else { return .zero }
         return UIScreen.main.bounds.width * 3/5
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        guard let channel = channelItem else { return nil }
         let imageView = UIImageView()
         imageView.backgroundColor = .gray
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
-        if let imageUrlString = channelItem?.imageUrlString {
-            imageView.loadImage(imageUrlString)
-        }
+        imageView.loadImage(channel.imageUrlString)
         return imageView
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let channel = channelItem else { return }
-        let episodePage = EpisodeViewController(channel.items[indexPath.row])
+        let episodePage = EpisodeViewController(channel.items[indexPath.row], channelName: channel.title)
         navigationController?.pushViewController(episodePage, animated: true)
     }
 }

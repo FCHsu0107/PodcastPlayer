@@ -18,7 +18,7 @@ enum ClientError: Error {
     case serverError
     case unexpectedError(Error?)
 }
-
+// TODO: need to refactor
 class RSSParser {
     func request(
         urlPath: String,
