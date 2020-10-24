@@ -9,10 +9,27 @@ import UIKit
 
 import SnapKit
 
+protocol EpisodeContainerDelegate: AnyObject {
+    func playbackBtnDidClick(btnStatus: EpisodeViewController.PlaybackStatus)
+}
+
 class EpisodeViewController: UIViewController {
     
-    private let item: EpisodeItem
+    private var detailContainer: EpisodeDetailContainer!
+    private var playerContainer: EpisodePlayerContainer!
+    
+    private let episodeImage = UIImageView()
+    private let channelNameLabel = UILabel()
+    private let titleLabel = UILabel()
+    
+    enum PlaybackStatus {
+        case pause
+        case play
+    }
+    
     private let channelName: String
+    private var item: EpisodeItem
+    private var currentPlaybackStatus: PlaybackStatus = .pause
     
     init(_ item: EpisodeItem, channelName: String) {
         self.item = item
@@ -31,7 +48,7 @@ class EpisodeViewController: UIViewController {
     
     private func setUpUI() {
         view.backgroundColor = .white
-        let episodeImage = UIImageView()
+        
         view.addSubview(episodeImage)
         episodeImage.loadImage(item.imageUrlString)
         episodeImage.backgroundColor = .gray
@@ -43,7 +60,6 @@ class EpisodeViewController: UIViewController {
             make.height.equalTo(episodeImage.snp.width)
         }
         
-        let channelNameLabel = UILabel()
         view.addSubview(channelNameLabel)
         channelNameLabel.textColor = .black
         channelNameLabel.font = UIFont.systemFont(ofSize: 22)
@@ -55,7 +71,7 @@ class EpisodeViewController: UIViewController {
             make.height.equalTo(episodeImage.snp.height).multipliedBy(0.22)
         }
         
-        let titleLabel = UILabel()
+        
         view.addSubview(titleLabel)
         titleLabel.font = UIFont.systemFont(ofSize: 16)
         titleLabel.textColor = .darkGray
@@ -66,32 +82,43 @@ class EpisodeViewController: UIViewController {
             make.top.equalTo(channelNameLabel.snp.bottom)
         }
         
-        let playButton = UIButton()
-        view.addSubview(playButton)
-        playButton.setImage(UIImage.asset(.play), for: .normal)
-        playButton.addTarget(self, action: #selector(clickPlayButton), for: .touchUpInside)
-        playButton.snp.makeConstraints { make in
-            make.bottom.equalTo(self.view.safeArea.bottom).offset(-8)
-            make.centerX.equalToSuperview()
-            make.height.width.equalTo(100)
+        detailContainer = EpisodeDetailContainer(delegate: self, item: item)
+        view.addSubview(detailContainer)
+        detailContainer.snp.makeConstraints { make in
+            make.top.equalTo(episodeImage.snp.bottom).offset(12)
+            make.leading.trailing.equalTo(episodeImage)
+            make.bottom.equalTo(view.safeArea.bottom).offset(-8)
         }
         
-        let descriptionTextView = UITextView()
-        view.addSubview(descriptionTextView)
-        descriptionTextView.textAlignment = .left
-        descriptionTextView.textColor = .black
-        descriptionTextView.font = UIFont.systemFont(ofSize: 14)
-        descriptionTextView.isEditable = false
-        descriptionTextView.text = item.description
-        descriptionTextView.snp.makeConstraints { make in
-            make.trailing.leading.equalTo(episodeImage)
+        playerContainer = EpisodePlayerContainer(delegate: self, item: item)
+        view.addSubview(playerContainer)
+        playerContainer.snp.makeConstraints { make in
             make.top.equalTo(episodeImage.snp.bottom).offset(12)
-            make.bottom.equalTo(playButton.snp.top).offset(-8)
+            make.leading.trailing.equalTo(episodeImage)
+            make.bottom.equalTo(self.view.safeArea.bottom).offset(-8)
         }
+        
+        switchContainer(currentPlaybackStatus)
     }
     
-    @objc private func clickPlayButton() {
-        //present next page
-        print("Play button did click")
+    private func playbackStatusDidChange(_ newStatus: PlaybackStatus) {
+        guard currentPlaybackStatus != newStatus else { return }
+        currentPlaybackStatus = newStatus
+        let hideString = newStatus == .play
+        titleLabel.isHidden = hideString
+        channelNameLabel.isHidden = hideString
+        switchContainer(newStatus)
+    }
+    
+    private func switchContainer(_ newStatus: PlaybackStatus) {
+        let hidePlayStatus = newStatus == .pause
+        detailContainer.isHidden = !hidePlayStatus
+        playerContainer.isHidden = hidePlayStatus
+    }
+}
+
+extension EpisodeViewController: EpisodeContainerDelegate {
+    func playbackBtnDidClick(btnStatus: PlaybackStatus) {
+        playbackStatusDidChange(btnStatus)
     }
 }
