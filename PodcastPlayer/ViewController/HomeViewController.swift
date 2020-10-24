@@ -13,19 +13,12 @@ class HomeViewController: UIViewController {
     
     var tableView: UITableView!
     var podcastList: [String] = ["A", "B", "C", "D"]
-    var netWorkManager = NetworkManager()
+    var channelItem: ChannelItem?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpUI()
-        netWorkManager.request { (result) in
-            switch result {
-            case .failure(let error):
-                print("JQ error \(error)")
-            case .success(let data):
-                print("JQ get data!! \(data)")
-            }
-        }
+        getRSSFeedInfo()
     }
     
     private func setUpUI() {
@@ -42,17 +35,34 @@ class HomeViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
     }
+    
+    private func getRSSFeedInfo() {
+        let rssFeedPath = "https://feeds.soundcloud.com/users/soundcloud:users:322164009/sounds.rss"
+        let parser = RSSParser()
+        parser.request(urlPath: rssFeedPath) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .failure(let error):
+                print("get data fail \(error)")// toast message
+            case .success(let item):
+                self.channelItem = item
+                self.tableView.reloadData()
+                print(item)
+            }
+        }
+    }
 }
 
 extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return podcastList.count
+        return channelItem?.items.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(HomePageTableViewCell.self, for: indexPath)
-        let item = podcastList[indexPath.row]
+        guard let channelItem = channelItem else { return cell }
+        let item = channelItem.items[indexPath.row]
         cell.cofigure(item)
         return cell
     }
@@ -73,7 +83,8 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let episodePage = EpisodeViewController(podcastList[indexPath.row])
+        guard let channel = channelItem else { return }
+        let episodePage = EpisodeViewController(channel.items[indexPath.row])
         navigationController?.pushViewController(episodePage, animated: true)
     }
 }

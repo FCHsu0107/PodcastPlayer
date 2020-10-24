@@ -55,9 +55,9 @@ class HomePageTableViewCell: UITableViewCell {
         }
     }
     
-    func cofigure(_ item: String) {
+    func cofigure(_ item: EpisodeItem) {
         podcastImage.backgroundColor = .red
-        titleLabel.text = item + " - 賺錢光靠自我成長不夠，也要觀察外部的趨勢變化。辛苦賺來的錢幣"
+        titleLabel.text = item.title
         publicDateLabel.text = "2020/10/22"
     }
 }
