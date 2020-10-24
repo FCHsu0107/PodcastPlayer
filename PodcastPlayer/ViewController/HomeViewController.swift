@@ -79,7 +79,12 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let imageView = UIImageView()
-        imageView.backgroundColor = .green
+        imageView.backgroundColor = .gray
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        if let imageUrlString = channelItem?.imageURLString {
+            imageView.loadImage(imageUrlString)
+        }
         return imageView
     }
     
