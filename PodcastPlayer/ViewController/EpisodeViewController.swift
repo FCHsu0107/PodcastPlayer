@@ -59,12 +59,13 @@ class EpisodeViewController: UIViewController {
         descriptionLabel.textColor = .black
         descriptionLabel.font = font
         descriptionLabel.numberOfLines = 0
+        descriptionLabel.sizeToFit()
         
         descriptionLabel.text = item.description
         descriptionLabel.snp.makeConstraints { make in
             make.trailing.leading.equalTo(episodeImage)
             make.top.equalTo(episodeImage.snp.bottom).offset(12)
-            make.bottom.equalTo(playButton.snp.top)
+            make.bottom.lessThanOrEqualTo(playButton.snp.top)
         }
     }
     

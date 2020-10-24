@@ -12,7 +12,6 @@ import SnapKit
 class HomeViewController: UIViewController {
     
     var tableView: UITableView!
-    var podcastList: [String] = ["A", "B", "C", "D"]
     var channelItem: ChannelItem?
 
     override func viewDidLoad() {
@@ -34,6 +33,7 @@ class HomeViewController: UIViewController {
         tableView.register(cellType: HomePageTableViewCell.self)
         tableView.delegate = self
         tableView.dataSource = self
+        tableView.separatorStyle = .none
     }
     
     private func getRSSFeedInfo() {
@@ -64,6 +64,7 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
         guard let channelItem = channelItem else { return cell }
         let item = channelItem.items[indexPath.row]
         cell.cofigure(item)
+        cell.selectionStyle = .none
         return cell
     }
     

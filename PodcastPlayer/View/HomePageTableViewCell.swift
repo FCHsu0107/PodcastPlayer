@@ -33,25 +33,28 @@ class HomePageTableViewCell: UITableViewCell {
             make.leading.equalToSuperview().offset(12)
         }
         
+        contentView.addSubview(publicDateLabel)
+        publicDateLabel.textAlignment = .left
+        publicDateLabel.font = UIFont.systemFont(ofSize: 14)
+        publicDateLabel.textColor = .black
+        publicDateLabel.numberOfLines = 1
+        publicDateLabel.snp.makeConstraints { make in
+            make.leading.equalTo(podcastImage.snp.trailing).offset(12)
+            make.bottom.equalTo(podcastImage).offset(-2)
+            make.trailing.equalToSuperview().offset(-12)
+        }
+        
         contentView.addSubview(titleLabel)
         titleLabel.textAlignment = .left
         titleLabel.font = UIFont.systemFont(ofSize: 14)
         titleLabel.textColor = .black
         titleLabel.numberOfLines = 0
+        titleLabel.sizeToFit()
         titleLabel.snp.makeConstraints { make in
-            make.leading.equalTo(podcastImage.snp.trailing).offset(12)
+            make.leading.equalTo(publicDateLabel)
             make.top.equalTo(podcastImage).offset(2)
-            make.trailing.equalToSuperview().offset(-12)
-        }
-        
-        contentView.addSubview(publicDateLabel)
-        publicDateLabel.textAlignment = .left
-        publicDateLabel.font = UIFont.systemFont(ofSize: 14)
-        publicDateLabel.textColor = .black
-        publicDateLabel.snp.makeConstraints { make in
-            make.leading.equalTo(titleLabel)
-            make.bottom.equalTo(podcastImage).offset(-2)
-            make.trailing.equalToSuperview().offset(-12)
+            make.trailing.equalTo(publicDateLabel)
+            make.bottom.lessThanOrEqualTo(publicDateLabel.snp.top).offset(2)
         }
     }
     
