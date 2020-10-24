@@ -68,13 +68,12 @@ class EpisodeViewController: UIViewController {
         
         let playButton = UIButton()
         view.addSubview(playButton)
-        playButton.backgroundColor = .blue
+        playButton.setImage(UIImage.asset(.play), for: .normal)
         playButton.addTarget(self, action: #selector(clickPlayButton), for: .touchUpInside)
         playButton.snp.makeConstraints { make in
             make.bottom.equalTo(self.view.safeArea.bottom).offset(-8)
             make.centerX.equalToSuperview()
-            make.height.equalTo(100)
-            make.width.equalTo(playButton.snp.height)
+            make.height.width.equalTo(100)
         }
         
         let descriptionTextView = UITextView()
@@ -87,7 +86,7 @@ class EpisodeViewController: UIViewController {
         descriptionTextView.snp.makeConstraints { make in
             make.trailing.leading.equalTo(episodeImage)
             make.top.equalTo(episodeImage.snp.bottom).offset(12)
-            make.bottom.equalTo(playButton.snp.top).offset(8)
+            make.bottom.equalTo(playButton.snp.top).offset(-8)
         }
     }
     
