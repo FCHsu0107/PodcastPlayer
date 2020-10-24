@@ -62,6 +62,6 @@ class HomePageTableViewCell: UITableViewCell {
         podcastImage.backgroundColor = .gray
         podcastImage.loadImage(item.imageUrlString)
         titleLabel.text = item.title
-        publicDateLabel.text = "2020/10/22"
+        publicDateLabel.text = item.pubDate.getDateString()
     }
 }
