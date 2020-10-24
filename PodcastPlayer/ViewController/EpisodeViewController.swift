@@ -31,8 +31,10 @@ class EpisodeViewController: UIViewController {
         view.backgroundColor = .white
         let episodeImage = UIImageView()
         view.addSubview(episodeImage)
-//        episodeImage.image = item.image
-        episodeImage.backgroundColor = .green
+        if let urlString = item.imageURLPath {
+            episodeImage.loadImage(urlString)
+        }
+        episodeImage.backgroundColor = .gray
         episodeImage.contentMode = .scaleAspectFill
         episodeImage.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(16)
@@ -59,8 +61,6 @@ class EpisodeViewController: UIViewController {
         descriptionLabel.textColor = .black
         descriptionLabel.font = font
         descriptionLabel.numberOfLines = 0
-        descriptionLabel.sizeToFit()
-        
         descriptionLabel.text = item.description
         descriptionLabel.snp.makeConstraints { make in
             make.trailing.leading.equalTo(episodeImage)
