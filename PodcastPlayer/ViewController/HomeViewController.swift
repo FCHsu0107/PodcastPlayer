@@ -47,7 +47,6 @@ class HomeViewController: UIViewController {
             case .success(let item):
                 self.channelItem = item
                 self.tableView.reloadData()
-                print(item)
             }
         }
     }
@@ -82,7 +81,7 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
         imageView.backgroundColor = .gray
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
-        if let imageUrlString = channelItem?.imageURLString {
+        if let imageUrlString = channelItem?.imageUrlString {
             imageView.loadImage(imageUrlString)
         }
         return imageView

@@ -60,9 +60,7 @@ class HomePageTableViewCell: UITableViewCell {
     
     func cofigure(_ item: EpisodeItem) {
         podcastImage.backgroundColor = .gray
-        if let urlString = item.imageURLPath {
-            podcastImage.loadImage(urlString)
-        }
+        podcastImage.loadImage(item.imageUrlString)
         titleLabel.text = item.title
         publicDateLabel.text = "2020/10/22"
     }

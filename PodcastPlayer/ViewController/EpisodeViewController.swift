@@ -31,9 +31,7 @@ class EpisodeViewController: UIViewController {
         view.backgroundColor = .white
         let episodeImage = UIImageView()
         view.addSubview(episodeImage)
-        if let urlString = item.imageURLPath {
-            episodeImage.loadImage(urlString)
-        }
+        episodeImage.loadImage(item.imageUrlString)
         episodeImage.backgroundColor = .gray
         episodeImage.contentMode = .scaleAspectFill
         episodeImage.snp.makeConstraints { make in
