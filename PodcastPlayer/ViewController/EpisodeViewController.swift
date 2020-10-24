@@ -77,18 +77,17 @@ class EpisodeViewController: UIViewController {
             make.width.equalTo(playButton.snp.height)
         }
         
-        let descriptionLabel = UILabel()
-        view.addSubview(descriptionLabel)
-        let font = UIFont.systemFont(ofSize: 14)
-        descriptionLabel.textAlignment = .natural
-        descriptionLabel.textColor = .black
-        descriptionLabel.font = font
-        descriptionLabel.numberOfLines = 0
-        descriptionLabel.text = item.description
-        descriptionLabel.snp.makeConstraints { make in
+        let descriptionTextView = UITextView()
+        view.addSubview(descriptionTextView)
+        descriptionTextView.textAlignment = .left
+        descriptionTextView.textColor = .black
+        descriptionTextView.font = UIFont.systemFont(ofSize: 14)
+        descriptionTextView.isEditable = false
+        descriptionTextView.text = item.description
+        descriptionTextView.snp.makeConstraints { make in
             make.trailing.leading.equalTo(episodeImage)
             make.top.equalTo(episodeImage.snp.bottom).offset(12)
-            make.bottom.lessThanOrEqualTo(playButton.snp.top)
+            make.bottom.equalTo(playButton.snp.top).offset(8)
         }
     }
     
