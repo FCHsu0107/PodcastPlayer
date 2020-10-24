@@ -20,11 +20,14 @@ class HomeViewController: UIViewController {
     }
     
     private func setUpUI() {
+        self.view.backgroundColor = .white
         tableView = UITableView(frame: .zero, style: .plain)
         
         view.addSubview(tableView)
         tableView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.trailing.leading.equalToSuperview()
+            make.top.equalTo(self.view.safeArea.top)
+            make.bottom.equalTo(self.view.safeArea.bottom)
         }
         tableView.register(cellType: HomePageTableViewCell.self)
         tableView.delegate = self

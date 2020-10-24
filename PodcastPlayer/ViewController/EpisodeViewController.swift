@@ -37,7 +37,7 @@ class EpisodeViewController: UIViewController {
         episodeImage.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(16)
             make.trailing.equalToSuperview().offset(-16)
-            make.top.equalToSuperview().offset(8)
+            make.top.equalTo(self.view.safeArea.top).offset(8)
             make.height.equalTo(episodeImage.snp.width)
         }
         
@@ -81,7 +81,7 @@ class EpisodeViewController: UIViewController {
         playButton.backgroundColor = .blue
         playButton.addTarget(self, action: #selector(clickPlayButton), for: .touchUpInside)
         playButton.snp.makeConstraints { make in
-            make.bottom.equalToSuperview().offset(-40)
+            make.bottom.equalTo(self.view.safeArea.bottom).offset(-8)
             make.centerX.equalToSuperview()
             make.height.equalTo(100)
             make.width.equalTo(playButton.snp.height)
