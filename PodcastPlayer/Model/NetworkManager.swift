@@ -7,65 +7,68 @@
 
 import Foundation
 
-import Alamofire
+import FeedKit
 
 enum ClientError: Error {
+    case urlNotFound
+    case rssFeedNotFound
     case clientError(Data?)
     case reponseError
     case serverError
     case unexpectedError(Error?)
 }
 
-class NetworkManager {
-    
+class RSSParser {
     func request(
-//        path: String,
-        completion: @escaping (Result<Data?, Error>) -> Void
+        urlPath: String,
+        completion: @escaping (Result<ChannelItem, Error>) -> Void
     ) {
-        let path = "https://feeds.soundcloud.com/users/soundcloud:users:322164009/sounds.rss"
-        URLSession.shared.dataTask(with: makeRequest(path: path), completionHandler: { (data, response, error) in
-            guard error == nil else {
-                return completion(.failure(ClientError.unexpectedError(error)))
-            }
-            guard let response = response as? HTTPURLResponse else {
-                return completion(.failure(ClientError.reponseError))
-            }
-            
-            let httpResponse = response
-            let statusCode = httpResponse.statusCode
-            
-            switch statusCode {
-            case 200..<300:
-                print(data as Any)
-                
-                completion(.success(data))
-            
-            case 400..<500:
-                
-                completion(.failure(ClientError.clientError(data)))
-                
-            case 500..<600:
-                
-                completion(.failure(ClientError.serverError))
-            
-            default: return
-            
-                completion(.failure(ClientError.unexpectedError(nil)))
-                
-            }
-            
-        }).resume()
+        guard let url = URL(string: urlPath) else { return }
+        let parser = FeedParser(URL: url)
         
+        parser.parseAsync(queue: DispatchQueue.global(qos: .userInitiated)) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .failure(let error):
+                    print("ERROR \(error)")
+                    completion(.failure(error))
+                case .success(let feed):
+                    switch feed {
+                    case .rss(let rss):
+                        let item = ChannelItemBuilder.parserRssFeed(rss)
+                        completion(.success(item))
+                    default:
+                        completion(.failure(ClientError.reponseError))
+                    }
+                }
+            }
+        }
     }
+}
 
-    private func makeRequest(path: String) -> URLRequest {
-        let url = URL(string: path)!
+class ChannelItemBuilder {
+    static func parserRssFeed(_ feed: RSSFeed) -> ChannelItem {
+        let channelTitle = feed.title // 科技島讀
+        let channelImageURLPath = feed.image?.url // String
         
-        var request = URLRequest(url: url)
+        guard let items = feed.items else {
+            let channelItem = ChannelItem(title: channelTitle, imageURLString: channelImageURLPath, items: [])
+            return channelItem
+        }
+    
+        var episodeItems: [EpisodeItem] = []
         
-        request.httpMethod = "GET"
+        for item in items {
+            let title = item.title
+            let link = item.link
+            let description = item.description
+            let pubDate = item.pubDate
+            let imageURLPath = item.iTunes?.iTunesImage?.attributes?.href
+            let episodeItem = EpisodeItem(title: title, pubDate: pubDate, link: link, description: description, imageURLPath: imageURLPath)
+            episodeItems.append(episodeItem)
+        }
         
-        return request
-        
+        let channelItem = ChannelItem(title: channelTitle, imageURLString: channelImageURLPath, items: episodeItems)
+        return channelItem
     }
 }
