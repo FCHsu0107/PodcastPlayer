@@ -30,9 +30,7 @@ class AudioPlayer {
     }
 
     func configure(delegate: AudioPlayerDelegate, urlString: String, isLoop: Bool = false, autoPlay: Bool = false) {
-        let urlPath = "https://s3-ap-northeast-1.amazonaws.com/mid-exam/Video/taeyeon.mp4" // Using fake url, because app cannot get soundcloud streaming url
-        //TODO query soundcloud streaming url
-        guard let url = URL(string: urlPath) else { return }// handle error
+        guard let url = URL(string: urlString) else { return }// handle error
         clearPlayerSetting()
         self.isLoop = isLoop
         self.autoPlay = autoPlay
@@ -106,7 +104,7 @@ class AudioPlayer {
         player?.seek(to: time)
     }
 
-    func forward(time: Double){
+    func forward(time: Double) {
         guard let player = player else { return }
         guard let duration = player.currentItem?.duration else { return }
         let currentTime = CMTimeGetSeconds(player.currentTime())
@@ -118,7 +116,7 @@ class AudioPlayer {
         } else { return }
     }
 
-    func rewind(time: Double){
+    func rewind(time: Double) {
         guard let player = player else { return }
         let currentTime = CMTimeGetSeconds(player.currentTime())
         let newTime = currentTime - time

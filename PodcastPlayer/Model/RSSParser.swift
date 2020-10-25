@@ -17,7 +17,6 @@ enum ParserError: Error {
     case unexpectedError(Error?)
 }
 
-// TODO: need to refactor
 class RSSParser {
     func request(
         urlPath: String,
@@ -55,14 +54,14 @@ class RSSParser {
         
         for item in items {
             guard let title = item.title,
-                  let link = item.link,
+                  let audioLink = item.enclosure?.attributes?.url,
                   let description = item.description,
                   let pubDate = item.pubDate,
                   let imageURLPath = item.iTunes?.iTunesImage?.attributes?.href
             else {
                 continue
             }
-            let episodeItem = EpisodeItem(title: title, pubDate: pubDate, link: link, description: description, imageUrlString: imageURLPath, index: episodeItems.count)
+            let episodeItem = EpisodeItem(title: title, pubDate: pubDate, link: audioLink, description: description, imageUrlString: imageURLPath, index: episodeItems.count)
             episodeItems.append(episodeItem)
         }
         

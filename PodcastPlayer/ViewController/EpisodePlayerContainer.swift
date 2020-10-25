@@ -94,9 +94,6 @@ class EpisodePlayerContainer: UIView {
     }
     
     private func configurePlayer(autoPlay: Bool = false) {
-        //TODO: query soundcloud streaming url SCSoundCloudAPIDelegate
-        //https://steelkiwi.com/blog/how-integrate-soundcloud-project-swift/
-        //https://soundcloud.com/you/apps
         player.configure(delegate: self, urlString: item.link, autoPlay: autoPlay)
     }
     
