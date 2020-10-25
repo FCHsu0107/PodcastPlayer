@@ -10,7 +10,8 @@ import Foundation
 import AVFoundation
 
 protocol AudioPlayerDelegate: AnyObject {
-    func currentTimeDidChange(_ currentTime: CMTime)
+    func assetDurationIsReady(durationInSec: Double)
+    func currentTimeDidChange(_ currentTimeInSec: Double)
     func reachEndAction()
 }
 
@@ -56,15 +57,20 @@ class AudioPlayer {
         
         // auto play
         self.playerItemObserver = playerItem.observe(\.status, options: [.new], changeHandler: { [weak self] playerItem, _ in
-            guard let self = self, playerItem.status == .readyToPlay, self.autoPlay else { return }
+            guard let self = self, playerItem.status == .readyToPlay else { return }
+            self.delegate?.assetDurationIsReady(durationInSec: playerItem.duration.seconds)
+            
+            if self.autoPlay {
                 self.play()
+            }
         })
         
         // update current time
         let interval = CMTime(seconds: 0.5, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
         let mainQueue = DispatchQueue.main
         self.periodicTimeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: mainQueue, using: { [weak self] time in
-            self?.delegate?.currentTimeDidChange(time)
+            let currentTimeInSec = time.seconds
+            self?.delegate?.currentTimeDidChange(currentTimeInSec)
         })
     }
 

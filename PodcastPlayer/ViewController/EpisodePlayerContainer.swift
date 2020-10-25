@@ -5,15 +5,15 @@
 //  Created by Fu-Chiung HSU on 2020/10/24.
 //
 
-import UIKit
-
 import CoreMedia.CMTime
+import UIKit
 
 class EpisodePlayerContainer: UIView {
 
     weak var delegate: EpisodeContainerDelegate?
     
     private let titleLabel = UILabel()
+    private let timecodeSlider = UISlider()
     private let player = AudioPlayer()
     
     private var item: EpisodeItem
@@ -52,8 +52,25 @@ class EpisodePlayerContainer: UIView {
             make.trailing.equalToSuperview().offset(-2)
         }
         
-        // slider to change time
+        addSubview(timecodeSlider)
+        timecodeSlider.addTarget(self, action: #selector(sliderValueDidChange(sender:)), for: .valueChanged)
+        timecodeSlider.snp.makeConstraints { make in
+            make.width.equalToSuperview().offset(-10)
+            make.centerX.equalToSuperview()
+            make.bottom.equalTo(pauseButton.snp.top).offset(-20)
+        }
+        
         configurePlayer()
+    }
+    
+    private func setSliderMaxValue(_ maxValue: Float) {
+        timecodeSlider.minimumValue = 0.0
+        timecodeSlider.maximumValue = maxValue
+    }
+    
+    private func updateSliderValue(_ newValue: Float) {
+        guard newValue <= timecodeSlider.maximumValue else { return }
+        timecodeSlider.value = newValue
     }
     
     private func configurePlayer(autoPlay: Bool = false) {
@@ -67,6 +84,13 @@ class EpisodePlayerContainer: UIView {
         //present next page
         print("pause button did click")
         delegate?.playbackBtnDidClick(btnStatus: .pause)
+    }
+    
+    @objc private func sliderValueDidChange(sender: UISlider) {
+        let value = sender.value
+        guard value > 0 else { return }
+        let newTime = CMTimeMake(value: Int64(value * 1000), timescale: 1000)
+        player.seek(to: newTime)
     }
 }
 
@@ -89,8 +113,14 @@ extension EpisodePlayerContainer: EpisodePageContainer {
 }
 
 extension EpisodePlayerContainer: AudioPlayerDelegate {
-    func currentTimeDidChange(_ currentTime: CMTime) {
-//        <#code#>
+    func assetDurationIsReady(durationInSec: Double) {
+        let duration = Float(durationInSec)
+        setSliderMaxValue(duration)
+    }
+    
+    func currentTimeDidChange(_ currentTime: Double) {
+        let time = Float(currentTime)
+        updateSliderValue(time)
     }
     
     func reachEndAction() {
