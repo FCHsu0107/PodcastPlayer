@@ -19,4 +19,5 @@ struct EpisodeItem {
     let link: String
     let description: String
     let imageUrlString: String
+    let index: Int
 }

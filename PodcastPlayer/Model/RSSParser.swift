@@ -62,7 +62,7 @@ class RSSParser {
             else {
                 continue
             }
-            let episodeItem = EpisodeItem(title: title, pubDate: pubDate, link: link, description: description, imageUrlString: imageURLPath)
+            let episodeItem = EpisodeItem(title: title, pubDate: pubDate, link: link, description: description, imageUrlString: imageURLPath, index: episodeItems.count)
             episodeItems.append(episodeItem)
         }
         
