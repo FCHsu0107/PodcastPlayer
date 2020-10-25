@@ -58,5 +58,7 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>PPBaseRSSFeed</key>
+	<string>https://feeds.soundcloud.com/users/soundcloud:users:322164009/sounds.rss</string>
 </dict>
 </plist>

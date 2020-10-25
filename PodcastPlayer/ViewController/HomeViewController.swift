@@ -17,7 +17,7 @@ class HomeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpUI()
-        getRSSFeedInfo()
+        updateChannelData()
     }
     
     private func setUpUI() {
@@ -36,20 +36,18 @@ class HomeViewController: UIViewController {
         tableView.separatorStyle = .none
     }
     
-    private func getRSSFeedInfo() {
-        // TODO: save url string in plist
-//        let rssFeedPath = "https://feeds.soundcloud.com/users/soundcloud:users:322164009/sounds.rss"
-//        let parser = RSSParser()
-//        parser.request(urlPath: rssFeedPath) { [weak self] result in
-//            guard let self = self else { return }
-//            switch result {
-//            case .failure(let error):
-//                print("get data fail \(error)")// toast message
-//            case .success(let item):
-//                self.channelItem = item
-//                self.tableView.reloadData()
-//            }
-//        }
+    private func updateChannelData() {
+        let provider = ChannelProvider()
+        provider.getChannelItem { [weak self] result in
+            switch result {
+            case .failure(let error):
+                //show toast?
+            print("Here is not channel \(error)")
+            case .success(let item):
+                self?.channelItem = item
+                self?.tableView.reloadData()
+            }
+        }
     }
 }
 

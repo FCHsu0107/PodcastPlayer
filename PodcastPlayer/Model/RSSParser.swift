@@ -42,31 +42,8 @@ class RSSParser {
             }
         }
     }
-}
-
-class ChannelItemBuilder {
     
-    func getItem(
-        withPath urlString: String,
-        completion: @escaping (Result<ChannelItem, Error>) -> Void
-    ) {
-        
-        let parser = RSSParser()
-        parser.request(urlPath: urlString) { [weak self] result in
-            switch result {
-            case .failure(let error):
-                completion(.failure(error))
-            
-            case .success(let rssFeed):
-                guard let item = self?.parserRssFeed(rssFeed) else {
-                    return completion(.failure(ParserError.parserDataFail))
-                }
-                completion(.success(item))
-            }
-        }
-    }
-    
-    private func parserRssFeed(_ feed: RSSFeed) -> ChannelItem? {
+    func parserRssFeed(_ feed: RSSFeed) -> ChannelItem? {
         guard let channelTitle = feed.title, // 科技島讀
               let channelImageURLPath = feed.image?.url, // String
               let items = feed.items
