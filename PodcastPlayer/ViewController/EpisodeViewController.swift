@@ -51,6 +51,10 @@ class EpisodeViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    deinit {
+        print("EpisodeViewController deinit")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpUI()

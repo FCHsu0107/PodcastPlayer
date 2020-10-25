@@ -51,8 +51,6 @@ class EpisodeDetailContainer: UIView {
     }
     
     @objc private func playButtonDidClick() {
-        //present next page
-        print("Play button did click")
         delegate?.playbackBtnDidClick(btnStatus: .play)
     }
 }

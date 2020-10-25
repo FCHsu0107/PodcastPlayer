@@ -94,7 +94,6 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
         guard let channel = channelItem else { return }
         let episodeItem = channel.items[indexPath.row]
         let episodePage = EpisodeViewController(self, item: episodeItem, channelName: channel.title)
-//        let episodePage = EpisodeViewController(self, item: episodeItem, channelName: channel.title)
         navigationController?.pushViewController(episodePage, animated: true)
     }
 }

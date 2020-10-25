@@ -101,8 +101,6 @@ class EpisodePlayerContainer: UIView {
     }
     
     @objc private func pauseButtonDidClick() {
-        //present next page
-        print("pause button did click")
         delegate?.playbackBtnDidClick(btnStatus: .pause)
     }
     
