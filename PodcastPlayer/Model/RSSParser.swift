@@ -9,40 +9,34 @@ import Foundation
 
 import FeedKit
 
-enum ClientError: Error {
+enum ParserError: Error {
     case urlNotFound
     case rssFeedNotFound
-    case failToDecode
-    case clientError(Data?)
+    case parserDataFail
     case reponseError
-    case serverError
     case unexpectedError(Error?)
 }
+
 // TODO: need to refactor
 class RSSParser {
     func request(
         urlPath: String,
-        completion: @escaping (Result<ChannelItem, Error>) -> Void
+        completion: @escaping (Result<RSSFeed, Error>) -> Void
     ) {
-        guard let url = URL(string: urlPath) else { return }
+        guard let url = URL(string: urlPath) else { return completion(.failure(ParserError.urlNotFound)) }
         let parser = FeedParser(URL: url)
         
         parser.parseAsync(queue: DispatchQueue.global(qos: .userInitiated)) { result in
             DispatchQueue.main.async {
                 switch result {
                 case .failure(let error):
-                    print("ERROR \(error)")
-                    completion(.failure(error))
+                    return completion(.failure(error))
                 case .success(let feed):
                     switch feed {
                     case .rss(let rss):
-                        guard let item = ChannelItemBuilder.parserRssFeed(rss) else {
-                            completion(.failure(ClientError.failToDecode))
-                            return
-                        }
-                        completion(.success(item))
+                        return completion(.success(rss))
                     default:
-                        completion(.failure(ClientError.reponseError))
+                        return completion(.failure(ParserError.reponseError))
                     }
                 }
             }
@@ -51,7 +45,28 @@ class RSSParser {
 }
 
 class ChannelItemBuilder {
-    static func parserRssFeed(_ feed: RSSFeed) -> ChannelItem? {
+    
+    func getItem(
+        withPath urlString: String,
+        completion: @escaping (Result<ChannelItem, Error>) -> Void
+    ) {
+        
+        let parser = RSSParser()
+        parser.request(urlPath: urlString) { [weak self] result in
+            switch result {
+            case .failure(let error):
+                completion(.failure(error))
+            
+            case .success(let rssFeed):
+                guard let item = self?.parserRssFeed(rssFeed) else {
+                    return completion(.failure(ParserError.parserDataFail))
+                }
+                completion(.success(item))
+            }
+        }
+    }
+    
+    private func parserRssFeed(_ feed: RSSFeed) -> ChannelItem? {
         guard let channelTitle = feed.title, // 科技島讀
               let channelImageURLPath = feed.image?.url, // String
               let items = feed.items
