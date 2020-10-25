@@ -108,6 +108,7 @@ class EpisodeViewController: UIViewController {
         titleLabel.isHidden = hideString
         channelNameLabel.isHidden = hideString
         switchContainer(newStatus)
+        playerContainer.startToPlayAudio(newStatus == .play)
     }
     
     private func switchContainer(_ newStatus: PlaybackStatus) {

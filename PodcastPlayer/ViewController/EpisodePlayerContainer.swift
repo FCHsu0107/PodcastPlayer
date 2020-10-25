@@ -12,6 +12,7 @@ class EpisodePlayerContainer: UIView {
     weak var delegate: EpisodeContainerDelegate?
     
     private let titleLabel = UILabel()
+    private let player = AudioPlayer()
     
     private var item: EpisodeItem
     
@@ -30,6 +31,14 @@ class EpisodePlayerContainer: UIView {
         guard newItem.title != item.title else { return }
         self.item = newItem
         titleLabel.text = item.title
+    }
+    
+    func startToPlayAudio(_ play: Bool) {
+        if play {
+            player.play()
+        } else {
+            player.pause()
+        }
     }
     
     private func setUpUI() {
@@ -56,6 +65,11 @@ class EpisodePlayerContainer: UIView {
         }
         
         // slider to change time
+        configurePlayer()
+    }
+    
+    private func configurePlayer() {
+        player.configure(urlString: item.link)
     }
     
     @objc private func clickPlayButton() {
