@@ -43,7 +43,7 @@ class RSSParser {
         }
     }
     
-    func parserRssFeed(_ feed: RSSFeed) -> ChannelItem? {
+    func parseRssFeed(_ feed: RSSFeed) -> ChannelItem? {
         guard let channelTitle = feed.title, // 科技島讀
               let channelImageURLPath = feed.image?.url, // String
               let items = feed.items

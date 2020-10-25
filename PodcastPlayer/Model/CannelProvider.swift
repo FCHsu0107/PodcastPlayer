@@ -51,7 +51,7 @@ class ChannelProvider {
                 completion(.failure(error))
             
             case .success(let rssFeed):
-                guard let item = parser.parserRssFeed(rssFeed) else {
+                guard let item = parser.parseRssFeed(rssFeed) else {
                     return completion(.failure(ParserError.parserDataFail))
                 }
                 
