@@ -27,20 +27,6 @@ class EpisodePlayerContainer: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func updateEpisodeItem(_ newItem: EpisodeItem) {
-        guard newItem.title != item.title else { return }
-        self.item = newItem
-        titleLabel.text = item.title
-    }
-    
-    func startToPlayAudio(_ play: Bool) {
-        if play {
-            player.play()
-        } else {
-            player.pause()
-        }
-    }
-    
     private func setUpUI() {
         let pauseButton = UIButton()
         addSubview(pauseButton)
@@ -68,8 +54,19 @@ class EpisodePlayerContainer: UIView {
         configurePlayer()
     }
     
-    private func configurePlayer() {
-        player.configure(urlString: item.link)
+    private func configurePlayer(autoPlay: Bool = false) {
+        //TODO: query soundcloud streaming url
+        player.configure(urlString: item.link, autoPlay: autoPlay) { [weak self] in
+            guard let self = self else { return }
+            self.playToEndAction()
+        }
+    }
+    
+    private func playToEndAction() {
+        if item.index > 0 {
+            let nextIndex = item.index - 1
+            delegate?.changeEpisode(toNext: nextIndex)
+        }
     }
     
     @objc private func clickPlayButton() {
@@ -77,5 +74,22 @@ class EpisodePlayerContainer: UIView {
         print("pause button did click")
         delegate?.playbackBtnDidClick(btnStatus: .pause)
     }
+}
 
+extension EpisodePlayerContainer: EpisodePageContainer {
+    func playbackStatusDidChange(_ newStatus: EpisodeViewController.PlaybackStatus) {
+        switch newStatus {
+        case .play:
+            player.play()
+        case .pause:
+            player.pause()
+        }
+    }
+    
+    func updateEpisodeItem(_ newItem: EpisodeItem) {
+        guard newItem.title != item.title else { return }
+        self.item = newItem
+        titleLabel.text = item.title
+        configurePlayer(autoPlay: true)
+    }
 }

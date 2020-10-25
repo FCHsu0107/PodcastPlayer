@@ -11,12 +11,21 @@ import SnapKit
 
 protocol EpisodeContainerDelegate: AnyObject {
     func playbackBtnDidClick(btnStatus: EpisodeViewController.PlaybackStatus)
+    func changeEpisode(toNext index: Int)
+}
+
+protocol EpisodePageContainer {
+    func playbackStatusDidChange(_ newStatus: EpisodeViewController.PlaybackStatus)
+    func updateEpisodeItem(_ newItem: EpisodeItem)
 }
 
 class EpisodeViewController: UIViewController {
     
+    weak var delegate: EpisodePageDelegate?
+    
     private var detailContainer: EpisodeDetailContainer!
     private var playerContainer: EpisodePlayerContainer!
+    lazy var containers: [EpisodePageContainer] = [detailContainer, playerContainer]
     
     private let episodeImage = UIImageView()
     private let channelNameLabel = UILabel()
@@ -31,7 +40,8 @@ class EpisodeViewController: UIViewController {
     private var item: EpisodeItem
     private var currentPlaybackStatus: PlaybackStatus = .pause
     
-    init(_ item: EpisodeItem, channelName: String) {
+    init(_ delegate: EpisodePageDelegate, item: EpisodeItem, channelName: String) {
+        self.delegate = delegate
         self.item = item
         self.channelName = channelName
         super.init(nibName: nil, bundle: nil)
@@ -50,7 +60,6 @@ class EpisodeViewController: UIViewController {
         view.backgroundColor = .white
         
         view.addSubview(episodeImage)
-        episodeImage.loadImage(item.imageUrlString)
         episodeImage.backgroundColor = .gray
         episodeImage.contentMode = .scaleAspectFill
         episodeImage.snp.makeConstraints { make in
@@ -76,7 +85,6 @@ class EpisodeViewController: UIViewController {
         titleLabel.font = UIFont.systemFont(ofSize: 16)
         titleLabel.textColor = .darkGray
         titleLabel.numberOfLines = 0
-        titleLabel.text = item.title
         titleLabel.snp.makeConstraints { make in
             make.trailing.leading.equalTo(channelNameLabel)
             make.top.equalTo(channelNameLabel.snp.bottom)
@@ -98,27 +106,49 @@ class EpisodeViewController: UIViewController {
             make.bottom.equalTo(self.view.safeArea.bottom).offset(-8)
         }
         
+        updateUIWithEpisodeItem()
         switchContainer(currentPlaybackStatus)
     }
     
     private func playbackStatusDidChange(_ newStatus: PlaybackStatus) {
         guard currentPlaybackStatus != newStatus else { return }
         currentPlaybackStatus = newStatus
-        let hideString = newStatus == .play
-        titleLabel.isHidden = hideString
-        channelNameLabel.isHidden = hideString
+        updateUIWithPlaybackStatus()
         switchContainer(newStatus)
-        playerContainer.startToPlayAudio(newStatus == .play)
     }
     
     private func switchContainer(_ newStatus: PlaybackStatus) {
         let hidePlayStatus = newStatus == .pause
         detailContainer.isHidden = !hidePlayStatus
         playerContainer.isHidden = hidePlayStatus
+        containers.forEach { container in
+            container.playbackStatusDidChange(newStatus)
+        }
+    }
+    
+    private func updateUIWithPlaybackStatus() {
+        let hideString = currentPlaybackStatus == .play
+        titleLabel.isHidden = hideString
+        channelNameLabel.isHidden = hideString
+    }
+    
+    private func updateUIWithEpisodeItem() {
+        episodeImage.loadImage(item.imageUrlString)
+        titleLabel.text = item.title
     }
 }
 
 extension EpisodeViewController: EpisodeContainerDelegate {
+    func changeEpisode(toNext index: Int) {
+        guard index >= 0 else { return }
+        guard let episodeItem = delegate?.getEpisodeItem(with: index) else { return }
+        self.item = episodeItem
+        updateUIWithEpisodeItem()
+        containers.forEach { container in
+            container.updateEpisodeItem(episodeItem)
+        }
+    }
+    
     func playbackBtnDidClick(btnStatus: PlaybackStatus) {
         playbackStatusDidChange(btnStatus)
     }

@@ -21,12 +21,14 @@ class AudioPlayer {
         print("JQ AudioPlayer deinit")
     }
 
-    func configure(urlString: String, isLoop: Bool = false, autoPlay: Bool = false) {
-        let urlPath = "https://s3-ap-northeast-1.amazonaws.com/mid-exam/Video/taeyeon.mp4"
+    func configure(urlString: String, isLoop: Bool = false, autoPlay: Bool = false, playToEndAction: (() -> Void)?) {
+        let urlPath = "https://s3-ap-northeast-1.amazonaws.com/mid-exam/Video/taeyeon.mp4" // Using fake url, because app cannot get soundcloud streaming url
+        //TODO query soundcloud streaming url
         guard let url = URL(string: urlPath) else { return }// handle error
         clearPlayerSetting()
         self.isLoop = isLoop
         self.autoPlay = autoPlay
+        self.playToEndAction = playToEndAction
         player = AVPlayer(url: url)
         addObservers()
     }
@@ -99,11 +101,12 @@ class AudioPlayer {
     }
 
     @objc func reachEndAction(_ notification: Notification) {
-        if isLoop {
-            stop()
+        pause()
+        if let action = playToEndAction {
+            action()
+        } else if isLoop {
+            seek(to: .zero)
             play()
-        } else {
-            playToEndAction?()
         }
     }
 

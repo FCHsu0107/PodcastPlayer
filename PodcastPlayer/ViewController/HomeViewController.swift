@@ -9,6 +9,10 @@ import UIKit
 
 import SnapKit
 
+protocol EpisodePageDelegate: AnyObject {
+    func getEpisodeItem(with index: Int) -> EpisodeItem?
+}
+
 class HomeViewController: UIViewController {
     
     var tableView: UITableView!
@@ -88,7 +92,16 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let channel = channelItem else { return }
-        let episodePage = EpisodeViewController(channel.items[indexPath.row], channelName: channel.title)
+        let episodeItem = channel.items[indexPath.row]
+        let episodePage = EpisodeViewController(self, item: episodeItem, channelName: channel.title)
+//        let episodePage = EpisodeViewController(self, item: episodeItem, channelName: channel.title)
         navigationController?.pushViewController(episodePage, animated: true)
+    }
+}
+
+extension HomeViewController: EpisodePageDelegate {
+    func getEpisodeItem(with index: Int) -> EpisodeItem? {
+        guard let channel = channelItem, index >= 0 else { return nil }
+        return channel.items[index]
     }
 }

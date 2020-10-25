@@ -26,12 +26,6 @@ class EpisodeDetailContainer: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func updateEpisodeItem(_ newItem: EpisodeItem) {
-        guard newItem.title != item.title else { return }
-        self.item = newItem
-        descriptionTextView.text = item.description
-    }
-    
     private func setUpUI() {
         let playButton = UIButton()
         addSubview(playButton)
@@ -61,5 +55,16 @@ class EpisodeDetailContainer: UIView {
         print("Play button did click")
         delegate?.playbackBtnDidClick(btnStatus: .play)
     }
+}
+
+extension EpisodeDetailContainer: EpisodePageContainer {
+    func playbackStatusDidChange(_ newStatus: EpisodeViewController.PlaybackStatus) {
+        // do nothing
+    }
     
+    func updateEpisodeItem(_ newItem: EpisodeItem) {
+        guard newItem.title != item.title else { return }
+        self.item = newItem
+        descriptionTextView.text = item.description
+    }
 }
