@@ -12,6 +12,8 @@ enum ImageAsset: String {
     //playback
     case play
     case pause
+    case forward
+    case rewind
     
 }
 

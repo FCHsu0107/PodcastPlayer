@@ -30,7 +30,7 @@ class EpisodeDetailContainer: UIView {
         let playButton = UIButton()
         addSubview(playButton)
         playButton.setImage(UIImage.asset(.play), for: .normal)
-        playButton.addTarget(self, action: #selector(clickPlayButton), for: .touchUpInside)
+        playButton.addTarget(self, action: #selector(playButtonDidClick), for: .touchUpInside)
         playButton.snp.makeConstraints { make in
             make.bottom.equalToSuperview()
             make.centerX.equalToSuperview()
@@ -50,7 +50,7 @@ class EpisodeDetailContainer: UIView {
         }
     }
     
-    @objc private func clickPlayButton() {
+    @objc private func playButtonDidClick() {
         //present next page
         print("Play button did click")
         delegate?.playbackBtnDidClick(btnStatus: .play)

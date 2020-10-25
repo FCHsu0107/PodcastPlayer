@@ -33,7 +33,7 @@ class EpisodePlayerContainer: UIView {
         let pauseButton = UIButton()
         addSubview(pauseButton)
         pauseButton.setImage(UIImage.asset(.pause), for: .normal)
-        pauseButton.addTarget(self, action: #selector(clickPlayButton), for: .touchUpInside)
+        pauseButton.addTarget(self, action: #selector(pauseButtonDidClick), for: .touchUpInside)
         pauseButton.snp.makeConstraints { make in
             make.bottom.equalToSuperview()
             make.centerX.equalToSuperview()
@@ -60,6 +60,26 @@ class EpisodePlayerContainer: UIView {
             make.bottom.equalTo(pauseButton.snp.top).offset(-20)
         }
         
+        let forwardButton = UIButton()
+        addSubview(forwardButton)
+        forwardButton.setImage(UIImage.asset(.forward), for: .normal)
+        forwardButton.addTarget(self, action: #selector(forwardButtonDidClick), for: .touchUpInside)
+        forwardButton.snp.makeConstraints { make in
+            make.centerY.equalTo(pauseButton)
+            make.leading.equalTo(pauseButton.snp.trailing).offset(12)
+            make.width.height.equalTo(80)
+        }
+        
+        let rewindButton = UIButton()
+        addSubview(rewindButton)
+        rewindButton.setImage(UIImage.asset(.rewind), for: .normal)
+        rewindButton.addTarget(self, action: #selector(rewindButtonDidClick), for: .touchUpInside)
+        rewindButton.snp.makeConstraints { make in
+            make.centerY.equalTo(pauseButton)
+            make.trailing.equalTo(pauseButton.snp.leading).offset(-12)
+            make.width.height.equalTo(80)
+        }
+        
         configurePlayer()
     }
     
@@ -80,7 +100,7 @@ class EpisodePlayerContainer: UIView {
         player.configure(delegate: self, urlString: item.link, autoPlay: autoPlay)
     }
     
-    @objc private func clickPlayButton() {
+    @objc private func pauseButtonDidClick() {
         //present next page
         print("pause button did click")
         delegate?.playbackBtnDidClick(btnStatus: .pause)
@@ -91,6 +111,14 @@ class EpisodePlayerContainer: UIView {
         guard value > 0 else { return }
         let newTime = CMTimeMake(value: Int64(value * 1000), timescale: 1000)
         player.seek(to: newTime)
+    }
+    
+    @objc private func forwardButtonDidClick() {
+        player.forward(time: 10.0)
+    }
+    
+    @objc private func rewindButtonDidClick() {
+        player.rewind(time: 10.0)
     }
 }
 

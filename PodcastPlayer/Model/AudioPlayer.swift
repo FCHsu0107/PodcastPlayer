@@ -112,13 +112,13 @@ class AudioPlayer {
         let currentTime = CMTimeGetSeconds(player.currentTime())
         let newTime = currentTime + time
 
-        if newTime < CMTimeGetSeconds(duration) - 10.0 {
+        if newTime < (CMTimeGetSeconds(duration) - time) {
             let newTime: CMTime = CMTimeMake(value: Int64(newTime * 1000), timescale: 1000)
             player.seek(to: newTime)
         } else { return }
     }
 
-    func backward(time: Double){
+    func rewind(time: Double){
         guard let player = player else { return }
         let currentTime = CMTimeGetSeconds(player.currentTime())
         let newTime = currentTime - time
