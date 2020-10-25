@@ -7,6 +7,8 @@
 
 import UIKit
 
+import CoreMedia.CMTime
+
 class EpisodePlayerContainer: UIView {
 
     weak var delegate: EpisodeContainerDelegate?
@@ -55,18 +57,10 @@ class EpisodePlayerContainer: UIView {
     }
     
     private func configurePlayer(autoPlay: Bool = false) {
-        //TODO: query soundcloud streaming url
-        player.configure(urlString: item.link, autoPlay: autoPlay) { [weak self] in
-            guard let self = self else { return }
-            self.playToEndAction()
-        }
-    }
-    
-    private func playToEndAction() {
-        if item.index > 0 {
-            let nextIndex = item.index - 1
-            delegate?.changeEpisode(toNext: nextIndex)
-        }
+        //TODO: query soundcloud streaming url SCSoundCloudAPIDelegate
+        //https://steelkiwi.com/blog/how-integrate-soundcloud-project-swift/
+        //https://soundcloud.com/you/apps
+        player.configure(delegate: self, urlString: item.link, autoPlay: autoPlay)
     }
     
     @objc private func clickPlayButton() {
@@ -91,5 +85,18 @@ extension EpisodePlayerContainer: EpisodePageContainer {
         self.item = newItem
         titleLabel.text = item.title
         configurePlayer(autoPlay: true)
+    }
+}
+
+extension EpisodePlayerContainer: AudioPlayerDelegate {
+    func currentTimeDidChange(_ currentTime: CMTime) {
+//        <#code#>
+    }
+    
+    func reachEndAction() {
+        if item.index > 0 {
+            let nextIndex = item.index - 1
+            delegate?.changeEpisode(toNext: nextIndex)
+        }
     }
 }

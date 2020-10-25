@@ -9,26 +9,33 @@ import Foundation
 
 import AVFoundation
 
+protocol AudioPlayerDelegate: AnyObject {
+    func currentTimeDidChange(_ currentTime: CMTime)
+    func reachEndAction()
+}
+
 class AudioPlayer {
-    private var observer: NSKeyValueObservation?
+    private var playerItemObserver: NSKeyValueObservation?
+    private var periodicTimeObserver: Any?
     private var player: AVPlayer?
     private var isLoop: Bool = false
     private var autoPlay: Bool = false
-    private var playToEndAction: (() -> Void)?
+    
+    weak var delegate: AudioPlayerDelegate?
 
     deinit {
         clearPlayerSetting()
-        print("JQ AudioPlayer deinit")
+        print("AudioPlayer deinit")
     }
 
-    func configure(urlString: String, isLoop: Bool = false, autoPlay: Bool = false, playToEndAction: (() -> Void)?) {
+    func configure(delegate: AudioPlayerDelegate, urlString: String, isLoop: Bool = false, autoPlay: Bool = false) {
         let urlPath = "https://s3-ap-northeast-1.amazonaws.com/mid-exam/Video/taeyeon.mp4" // Using fake url, because app cannot get soundcloud streaming url
         //TODO query soundcloud streaming url
         guard let url = URL(string: urlPath) else { return }// handle error
         clearPlayerSetting()
         self.isLoop = isLoop
         self.autoPlay = autoPlay
-        self.playToEndAction = playToEndAction
+        self.delegate = delegate
         player = AVPlayer(url: url)
         addObservers()
     }
@@ -36,22 +43,41 @@ class AudioPlayer {
     private func clearPlayerSetting() {
         removeObservers()
         player = nil
+        delegate = nil
+        autoPlay = false
+        isLoop = false
     }
 
     private func addObservers() {
         guard let player = player, let playerItem = player.currentItem else { return }
+        
+        // play to end time action
         NotificationCenter.default.addObserver(self, selector: #selector(reachEndAction(_:)), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: playerItem)
         
-        self.observer = playerItem.observe(\.status, options: [.new], changeHandler: { [weak self] playerItem, _ in
+        // auto play
+        self.playerItemObserver = playerItem.observe(\.status, options: [.new], changeHandler: { [weak self] playerItem, _ in
             guard let self = self, playerItem.status == .readyToPlay, self.autoPlay else { return }
                 self.play()
+        })
+        
+        // update current time
+        let interval = CMTime(seconds: 0.5, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
+        let mainQueue = DispatchQueue.main
+        self.periodicTimeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: mainQueue, using: { [weak self] time in
+            self?.delegate?.currentTimeDidChange(time)
         })
     }
 
     private func removeObservers() {
-        observer?.invalidate()
+        
         if let playerItem = player?.currentItem {
             NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: playerItem)
+        }
+        
+        playerItemObserver?.invalidate()
+        
+        if let player = player, let observer = periodicTimeObserver {
+            player.removeTimeObserver(observer)
         }
     }
 
@@ -102,11 +128,11 @@ class AudioPlayer {
 
     @objc func reachEndAction(_ notification: Notification) {
         pause()
-        if let action = playToEndAction {
-            action()
-        } else if isLoop {
+        if isLoop {
             seek(to: .zero)
             play()
+        } else {
+            delegate?.reachEndAction()
         }
     }
 
