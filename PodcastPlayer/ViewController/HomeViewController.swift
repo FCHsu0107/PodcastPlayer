@@ -26,7 +26,7 @@ class HomeViewController: UIViewController {
     
     private func setUpUI() {
         self.view.backgroundColor = .white
-        tableView = UITableView(frame: .zero, style: .plain)
+        tableView = UITableView(frame: .zero, style: .grouped)
         
         view.addSubview(tableView)
         tableView.snp.makeConstraints { make in
@@ -72,6 +72,10 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 100
+    }
+    
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return 0.01
     }
     
     // Header
